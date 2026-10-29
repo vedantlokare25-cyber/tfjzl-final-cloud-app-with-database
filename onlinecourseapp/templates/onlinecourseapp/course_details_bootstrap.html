@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Online Course</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'onlinecourseapp:index' %}">Home</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">{{ user.username }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container mt-5">
+        <h2>{{ course.name }}</h2>
+        <p>{{ course.description }}</p>
+
+        <h3>Lessons</h3>
+        <div class="card-deck">
+            {% for lesson in course.lesson_set.all %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ lesson.title }}</h5>
+                        <p class="card-text">{{ lesson.content }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if user.is_authenticated and not user.is_staff %}
+            <form action="{% url 'onlinecourseapp:submit' course.id %}" method="post">
+                {% csrf_token %}
+                <h3>Exam Questions</h3>
+                {% for question in course.question_set.all %}
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ question.question_text }}</h5>
+                            {% for choice in question.choice_set.all %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="choice_{{ choice.id }}" value="{{ choice.id }}" id="choice_{{ choice.id }}">
+                                    <label class="form-check-label" for="choice_{{ choice.id }}">
+                                        {{ choice.choice_text }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary mt-3">Submit Exam</button>
+            </form>
+        {% endif %}
+    </div>
+</body>
+</html>
