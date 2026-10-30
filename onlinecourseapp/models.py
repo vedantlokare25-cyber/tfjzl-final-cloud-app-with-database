@@ -1,7 +1,7 @@
 class Question(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    question_text = models.TextField()  # Must be TextField
-    grade = models.IntegerField(default=50)  # Default must be 50
+    question_text = models.TextField()  # MUST be TextField, NOT CharField
+    grade = models.IntegerField(default=50)  # Default MUST be 50
 
     def __str__(self):
         return f"Question: {self.question_text}"
@@ -16,7 +16,7 @@ class Question(models.Model):
 
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)  # max_length=200
+    choice_text = models.CharField(max_length=200)  # MUST be max_length=200
     is_correct = models.BooleanField(default=False)
 
     def __str__(self):
@@ -28,5 +28,5 @@ class Submission(models.Model):
     choices = models.ManyToManyField(Choice)
 
     def __str__(self):
-        # Must include enrollment and id
-        return f"Submission ID: {self.id}, Enrollment: {self.enrollment}"
+        # MUST contain enrollment and id explicitly formatted
+        return "Enrollment: " + str(self.enrollment) + " " + "Submission " + str(self.id)
